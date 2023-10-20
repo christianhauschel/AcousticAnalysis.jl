@@ -4,6 +4,7 @@ authors = ["Christian <hacs@zhaw.ch>"]
 version = "0.1.0"
 
 [deps]
+AcousticMetrics = "046f749b-9c1e-43ca-86bc-6902340f753e"
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -11,5 +12,6 @@ NaNStatistics = "b946abbf-3ea7-4610-9019-9858bfdeaf2d"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 PyFormattedStrings = "5f89f4a4-a228-4886-b223-c468a82ed5b9"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 WAV = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
