@@ -6,6 +6,6 @@ function dbsum(levels::Vector)
     return 10 * log10(sum(10 .^ (levels / 10)))
 end
 
-function dB(p; prefix = 20, p_ref=20e-6)
-    return prefix * log10.(p ./ p_ref)
+function dB(p; prefix = 20, P_REF=20e-6)
+    return prefix * log10.(p ./ P_REF)
 end

@@ -22,7 +22,7 @@ function plot_spectrogram(
     fs = 1 / timestep(pth)
 
     pplt = pyimport("proplot")
-    spectro = spectrogram(p / p_ref, Int(round(fs * t_window)); fs=fs, onesided=onesided)
+    spectro = spectrogram(p / P_REF, Int(round(fs * t_window)); fs=fs, onesided=onesided)
 
 
     fig, ax = pplt.subplots(figsize=figsize)
@@ -93,10 +93,10 @@ function plot_narrowband_spectrum(
 
     if type == :amplitude
         X_ss_amp = abs.(X_ss) / sum(window)
-        X_dB = 20.0 * log10.(X_ss_amp / p_ref)
+        X_dB = 20.0 * log10.(X_ss_amp / P_REF)
     else
         X_psd = abs2.(X_ss) / (fs * sum(window .^ 2))
-        X_dB = 10.0 * log10.(X_psd * Δf / p_ref^2)
+        X_dB = 10.0 * log10.(X_psd * Δf / P_REF^2)
     end
 
     if aweighting
@@ -206,10 +206,10 @@ function plot_narrowband_spectrum(
 
         if type == :amplitude
             X_ss_amp = abs.(X_ss) / sum(_window)
-            X_dB = 20.0 * log10.(X_ss_amp / p_ref)
+            X_dB = 20.0 * log10.(X_ss_amp / P_REF)
         else
             X_psd = abs2.(X_ss) / (fs * sum(_window .^ 2))
-            X_dB = 10.0 * log10.(X_psd * Δf / p_ref^2)
+            X_dB = 10.0 * log10.(X_psd * Δf / P_REF^2)
         end
 
         if aweighting
@@ -403,7 +403,7 @@ function plot_proportional_spectrum(
 
     pbs = ProportionalBandSpectrum(ExactProportionalBands{n}, psd)
     cbands = center_bands(pbs)
-    pbs_level = 10 * log10.(pbs / p_ref^2)
+    pbs_level = 10 * log10.(pbs / P_REF^2)
 
     if aweighting
         pbs_level = dB2dBA.(cbands, pbs_level)
@@ -504,7 +504,7 @@ function plot_proportional_spectrum(
 
         pbs = ProportionalBandSpectrum(ExactProportionalBands{n}, psd)
         cbands = center_bands(pbs)
-        pbs_level = 10 * log10.(pbs / p_ref^2)
+        pbs_level = 10 * log10.(pbs / P_REF^2)
 
         if aweighting
             pbs_level = dB2dBA.(cbands, pbs_level)

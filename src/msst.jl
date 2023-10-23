@@ -4,10 +4,36 @@ using Statistics
 using DSP
 using Base.Threads
 
+"""
+    msst(pth::PressureTimeHistory, length_window::Int, n_iterations::Int)
 
-function msst(x, hlength::Int, num::Int)
+Computes the multisynchrosqueezing transform (MSST) of the signal using the 
+Expression (31)-based Algorithm [1].
+
+# Arguments
+- `pth::PressureTimeHistory`: Pressure time history
+- `length_window::Int`: Length of the window function
+- `n_iterations::Int`: Number of iterations
+
+# Retuns
+- `MSST::Array{ComplexF64,2}`: Multisynchrosqueezing transform
+
+# References
+[1] G. Yu, Z. Wang, and P. Zhao, “Multisynchrosqueezing Transform,” IEEE
+    Transactions on Industrial Electronics, vol. 66, pp. 5441–5455,
+    Jul. 2019, doi: 10.1109/TIE.2018.2868296.
+    
+[2] G. Yu, “A multisynchrosqueezing-based high-resolution time-frequency
+    analysis tool for the analysis of non-stationary signals,” Journal of
+    Sound and Vibration, vol. 492, p. 115813, Oct. 2020,
+    doi: 10.1016/j.jsv.2020.115813.
+"""
+function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 512)
+
+    x = pressure(pth)
+
     xrow = length(x)
-    hlength = hlength + 1 - hlength % 2
+    hlength = length_window + 1 - length_window % 2
     ht = LinRange(-0.5, 0.5, hlength)
 
     # Gaussian window
@@ -59,8 +85,8 @@ function msst(x, hlength::Int, num::Int)
     # Block 2 (27 s)
     # ---------------------------------
     # t0 = time()
-    if num > 1
-        for kk in 1:num - 1
+    if n_iterations > 1
+        for kk in 1:n_iterations - 1
             for b in 1:nb
                 for eta in 1:neta
                     k = Int(omega[eta, b])
@@ -92,8 +118,9 @@ function msst(x, hlength::Int, num::Int)
     end
   
 
-    tfr = tfr / (N / 2)
-    Ts = Ts / (N / 2)
+    # STFT = tfr / (N / 2)
+    MSST = Ts / (N / 2)
 
-    return Ts, tfr, omega2
+    return MSST
 end
+

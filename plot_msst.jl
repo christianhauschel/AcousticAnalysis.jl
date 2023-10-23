@@ -60,3 +60,47 @@ OASPL(pth1)
 # plot_narrowband_spectrum(pth1)
 # plot_proportional_spectrum(pth1, fname="plots/spectrum_proportional.png")
 # plot_narrowband_spectrum([pth1, pth1_A], label=[f"{OASPL(pth1):0.2f} dB", f"{OASPL(pth1_A):0.2f} dB(A)"], fname="plots/spectrum_narrow.png")
+
+
+MSST = msst(pth1, 4; length_window=512)
+
+noise_floor = -50
+T_msst_plot = 20.0 * log10.(abs.(MSST) / P_REF)
+T_msst_plot_min = minimum(T_msst_plot[.!isinf.(T_msst_plot)])
+T_msst_plot = ifelse.(isinf.(T_msst_plot), noise_floor, T_msst_plot)
+
+t_msst = AcousticAnalysis.time(pth1)
+f_msst = Vector(LinRange(0, fs1/2, size(MSST, 1)))
+
+fig, ax = plt.subplots(figsize=(7, 3))
+# if t_window > 0.2
+
+#     mesh = ax[1].pcolorfast(
+#         t,
+#         f_msst,
+#         T_msst_plot,
+#         # shading="gouraud",
+#         vmin=maximum([T_msst_plot_min, noise_floor, maximum(T_msst_plot) - 45.0]),
+#         vmax=maximum(T_msst_plot),
+#         rasterized=True,
+#     )  # type: ignore
+# else
+
+mesh = ax.pcolorfast(
+    t_msst,
+    f_msst,
+    T_msst_plot,
+    # shading="gouraud",
+    vmin=maximum([T_msst_plot_min, noise_floor, maximum(T_msst_plot) - 45.0]),
+    vmax=maximum(T_msst_plot),
+    rasterized=true,
+)  # type: ignore
+# end
+
+cbar = fig.colorbar(mesh, ax=ax, label="dB")
+ax.set(
+    ylim=(f_msst[1], f_msst[end]),
+    title="MSST",
+    xlabel="t [s]",
+    ylabel="f [Hz]",
+)
