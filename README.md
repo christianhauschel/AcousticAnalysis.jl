@@ -1,8 +1,8 @@
 # `AcousticAnalysis`
 
-<img src="doc/spectrum_narrow.png" width=500></img>
-<img src="doc/spectrum_proportional.png" width=500></img>
-<img src="doc/spectrogram.png" width=500></img>
+<img src="doc/img/spectrum_narrow.png" width=500></img>
+<img src="doc/img/spectrum_proportional_A.png" width=500></img>
+<img src="doc/img/spectrogram.png" width=500></img>
 
 ## Installation
 

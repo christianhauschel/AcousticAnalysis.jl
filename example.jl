@@ -25,7 +25,7 @@ pth2 = PressureTimeHistory(p2, 1/fs2)
 bpf1=66.6667
 bpf2=100
 
-# plot_spectrogram(pth1; ylim=(0, 1000), fname="out/spectrogram.png", t_window=0.5)
+plot_spectrogram(pth2; ylim=(0, 1000), fname="out/spectrogram.png", t_window=0.5)
 # plot_history(pth2; fname="out/time_history.png", label="2")
 # plot_narrowband_spectrum(pth1; bpf=bpf1, fname="out/spectrum_psd.png", type=:psd, aweighting=true)
 # plot_narrowband_spectrum(p2, fs2; bpf=bpf2, fname="out/spectrum_psa.png")
