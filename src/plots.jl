@@ -132,9 +132,9 @@ function plot_narrowband_spectrum(
 
     if ylabel === nothing
         if type == :amplitude
-            ylabel = L"$L_p$ [dB re 20 μPa]"
+            ylabel = L"$L_p$ (Amp) [dB re 20 μPa]"
         else
-            ylabel = L"PSD [dB re 20 μPa / $Δf^{1/2}_{ref}$]"
+            ylabel = L"$L_p$ [dB re 20 μPa / $Δf^{1/2}_{ref}$]"
         end
     end
 
@@ -257,9 +257,9 @@ function plot_narrowband_spectrum(
 
     if ylabel === nothing
         if type == :amplitude
-            ylabel = L"$L_p$ [dB re 20 μPa]"
+            ylabel = L"$L_p$ (Amp) [dB re 20 μPa]"
         else
-            ylabel = L"PSD [dB re 20 μPa / $Δf^{1/2}_{ref}$]"
+            ylabel = L"$L_p$ [dB re 20 μPa / $Δf^{1/2}_{ref}$]"
         end
     end
 
