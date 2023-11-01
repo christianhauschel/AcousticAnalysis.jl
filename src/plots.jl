@@ -60,6 +60,8 @@ function plot_narrowband_spectrum(
     label=nothing,
     aweighting=false,
     show_oaspl=true,
+    lw=1,
+    alpha=1,
 )
     p = pressure(pth)
     fs = 1 / timestep(pth)
@@ -110,9 +112,9 @@ function plot_narrowband_spectrum(
     fig, ax = pplt.subplots(figsize=figsize)
 
     if label === nothing
-        ax[1].plot(f, X_dB)
+        ax[1].plot(f, X_dB, lw=lw, alpha=alpha)
     else
-        ax[1].plot(f, X_dB, label=label)
+        ax[1].plot(f, X_dB, label=label, lw=lw, alpha=alpha)
     end
 
     if ymax === nothing
@@ -172,6 +174,8 @@ function plot_narrowband_spectrum(
     window=:hanning,
     label=nothing,
     aweighting=false,
+    lw=1,
+    alpha=1,
 )
     pplt = pyimport("proplot")
 
@@ -218,9 +222,9 @@ function plot_narrowband_spectrum(
         end
 
         if label === nothing
-            ax[1].plot(f, X_dB)
+            ax[1].plot(f, X_dB, lw=lw, alpha=alpha)
         else
-            ax[1].plot(f, X_dB, label=label[k])
+            ax[1].plot(f, X_dB, label=label[k], lw=lw, alpha=alpha)
         end
 
 
@@ -293,6 +297,8 @@ function plot_history(
     xlabel="t [s]",
     ylabel="p [Pa]",
     label=nothing,
+    lw=1,
+    alpha=1,
 )
     pplt = pyimport("proplot")
 
@@ -303,9 +309,9 @@ function plot_history(
         t = Vector(time(list_pth[i]))
 
         if label === nothing
-            ax[1].plot(t, p)
+            ax[1].plot(t, p, lw=lw, alpha=alpha)
         else
-            ax[1].plot(t, p, label=label[i])
+            ax[1].plot(t, p, label=label[i], lw=lw, alpha=alpha)
         end
     end
 
@@ -334,6 +340,8 @@ function plot_history(
     xlabel="t [s]",
     ylabel="p [Pa]",
     label=nothing,
+    lw=1,
+    alpha=1,
 )
     p = pressure(pth)
     fs = 1 / timestep(pth)
@@ -350,9 +358,9 @@ function plot_history(
     end
 
     if label === nothing
-        ax[1].plot(t, p)
+        ax[1].plot(t, p, lw=lw, alpha=alpha)
     else
-        ax[1].plot(t, p, label=label)
+        ax[1].plot(t, p, label=label, lw=lw, alpha=alpha)
     end
 
 
@@ -389,6 +397,8 @@ function plot_proportional_spectrum(
     label=nothing,
     dpi=300,
     show_oaspl=true,
+    lw=1,
+    alpha=1,
 )
     if show_oaspl
         if label === nothing
@@ -452,9 +462,9 @@ function plot_proportional_spectrum(
     fig, ax = pplt.subplots(figsize=figsize)
 
     if label === nothing
-        ax[1].plot(cbands, pbs_level)
+        ax[1].plot(cbands, pbs_level, lw=lw, alpha=alpha)
     else
-        ax[1].plot(cbands, pbs_level, label=label)
+        ax[1].plot(cbands, pbs_level, label=label, lw=lw, alpha=alpha)
     end
 
     ax[1].set(
@@ -489,6 +499,8 @@ function plot_proportional_spectrum(
     xlabel=nothing,
     label=nothing,
     dpi=300,
+    lw=1,
+    alpha=1,
 )
     pplt = pyimport("proplot")
     fig, ax = pplt.subplots(figsize=figsize)
@@ -512,9 +524,9 @@ function plot_proportional_spectrum(
         end
 
         if label === nothing
-            ax[1].plot(cbands, pbs_level)
+            ax[1].plot(cbands, pbs_level, lw=lw, alpha=alpha)
         else
-            ax[1].plot(cbands, pbs_level, label=label[i])
+            ax[1].plot(cbands, pbs_level, label=label[i], lw=lw, alpha=alpha)
         end
 
         if xmax === nothing
