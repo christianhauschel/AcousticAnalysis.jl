@@ -50,6 +50,8 @@ function plot_narrowband_spectrum(
     figsize=(6, 3),
     bpf=nothing,
     n_bpf=10,
+    xmin=nothing,
+    xmax=nothing,
     ymin=0,
     ymax=nothing,
     title="Spectrum",
@@ -140,13 +142,20 @@ function plot_narrowband_spectrum(
         end
     end
 
+    if xmin === nothing
+        xmin = minimum([100, minimum(bpf) * 0.5])
+    end
+    if xmax === nothing
+        xmax = fs / 2.0
+    end
+
     ax[1].set(
         title=title,
         xscale="log",
         xlabel=xlabel,
         ylabel=ylabel,
         ylim=(ymin, ymax),
-        xlim=(minimum([100, bpf * 0.8]), fs / 2.0),
+        xlim=(xmin, xmax),
     )
 
     if label !== nothing
@@ -165,6 +174,8 @@ function plot_narrowband_spectrum(
     figsize=(6, 3),
     bpf=[],
     n_bpf=10,
+    xmin=nothing,
+    xmax=nothing,
     ymin=0,
     ymax=nothing,
     title="Spectrum",
@@ -183,10 +194,13 @@ function plot_narrowband_spectrum(
 
     list_ymax = []
     list_ymin = []
+    list_fs = []
 
     for k in 1:length(list_pth)
         p = pressure(list_pth[k])
         fs = 1 / timestep(list_pth[k])
+
+        push!(list_fs, fs)
 
         N = length(p)
 
@@ -250,6 +264,13 @@ function plot_narrowband_spectrum(
         ymin = minimum(list_ymin)
     end
 
+    if xmin === nothing
+        xmin = minimum([100, minimum(bpf) * 0.5])
+    end
+    if xmax === nothing
+        xmax = maximum(list_fs) / 2.0
+    end
+
     if plot_bpf
         for k in 1:length(list_pth)
             for i = 1:n_bpf
@@ -279,7 +300,7 @@ function plot_narrowband_spectrum(
         xlabel=xlabel,
         ylabel=ylabel,
         ylim=(ymin, ymax),
-        xlim=(minimum([100, minimum(bpf) * 0.8]), maximum(list_fs) / 2.0),
+        xlim=(xmin, xmax),
     )
 
     if fname !== nothing
