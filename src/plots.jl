@@ -1,5 +1,16 @@
 
+"""
+    clean_data(x, y)
 
+Clean data by removing NaN and Inf values and interpolating linearly.
+
+# Arguments
+- `x`: x data
+- `y`: y data
+
+# Returns
+- `y`: cleaned y data
+"""
 function clean_data(x, y)
     mask = .!isinf.(y) .& .!isnan.(y)
     _y = y[mask]
@@ -41,6 +52,7 @@ function plot_spectrogram(
     if fname !== nothing
         fig.savefig(fname, dpi=dpi)
     end
+    return fig
 end
 
 function plot_narrowband_spectrum(
@@ -107,7 +119,7 @@ function plot_narrowband_spectrum(
         X_dB = dB2dBA.(f, X_dB)
         X_dB = clean_data(f, X_dB)
     end
-    
+
 
     pplt = pyimport("proplot")
 
@@ -166,6 +178,8 @@ function plot_narrowband_spectrum(
         fig.savefig(fname, dpi=dpi)
 
     end
+
+    return fig
 end
 function plot_narrowband_spectrum(
     list_pth::Vector;
@@ -307,6 +321,8 @@ function plot_narrowband_spectrum(
         fig.savefig(fname, dpi=dpi)
 
     end
+
+    return fig
 end
 
 function plot_history(
@@ -350,6 +366,8 @@ function plot_history(
     if fname !== nothing
         fig.savefig(fname, dpi=dpi)
     end
+
+    return fig
 end
 function plot_history(
     pth::PressureTimeHistory;
@@ -390,7 +408,7 @@ function plot_history(
         xlabel=xlabel,
         ylabel=ylabel,
     )
-    
+
     if label !== nothing
         ax[1].legend(ncols=1)
     end
@@ -399,7 +417,7 @@ function plot_history(
         fig.savefig(fname, dpi=dpi)
     end
 
-
+    return fig
 end
 
 function plot_proportional_spectrum(
@@ -504,6 +522,8 @@ function plot_proportional_spectrum(
     if fname !== nothing
         fig.savefig(fname, dpi=dpi)
     end
+
+    return fig
 end
 function plot_proportional_spectrum(
     list_pth::Vector;
@@ -611,4 +631,6 @@ function plot_proportional_spectrum(
     if fname !== nothing
         fig.savefig(fname, dpi=dpi)
     end
+
+    return fig
 end
