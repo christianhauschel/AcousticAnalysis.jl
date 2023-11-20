@@ -40,7 +40,7 @@ bpf2=100
 pth1_A = aweighting(pth1)
 
 # plot_narrowband_spectrum(pth1)
-plot_proportional_spectrum([pth1, pth2])
+plot_proportional_spectrum(highpass.([pth1, pth2], 200; attenuation_stopband=100))
 # plot_narrowband_spectrum(pth1)
 # plot_narrowband_spectrum([pth1, pth1_A], label=[f"{OASPL(pth1):0.2f} dB", f"{OASPL(pth1_A):0.2f} dB(A)"], fname="out/spectrum_narrow.png")
 
