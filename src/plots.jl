@@ -80,6 +80,17 @@ function plot_narrowband_spectrum(
     p = pressure(pth)
     fs = 1 / timestep(pth)
 
+    if xmin === nothing
+        try
+            xmin = minimum([100, minimum(bpf) * 0.5])
+        catch
+            xmin = 100
+        end
+    end
+    if xmax === nothing
+        xmax = fs / 2.0
+    end
+
     if show_oaspl
         if label === nothing
             label = ""
@@ -131,11 +142,14 @@ function plot_narrowband_spectrum(
         ax[1].plot(f, X_dB, label=label, lw=lw, alpha=alpha)
     end
 
+    # select X_dB > xmin, < xmax
+    _X_dB = X_dB[(f.>xmin).&(f.<xmax)]
     if ymax === nothing
-        ymax = maximum(X_dB) + 0.1 * mean(X_dB)
+
+        ymax = maximum(_X_dB) + 2
     end
     if ymin === nothing
-        ymin = minimum(X_dB) - 0.1 * mean(X_dB)
+        ymin = minimum(_X_dB) - 2
     end
 
     if bpf !== nothing
@@ -154,12 +168,7 @@ function plot_narrowband_spectrum(
         end
     end
 
-    if xmin === nothing
-        xmin = minimum([100, minimum(bpf) * 0.5])
-    end
-    if xmax === nothing
-        xmax = fs / 2.0
-    end
+
 
     ax[1].set(
         title=title,
@@ -211,10 +220,31 @@ function plot_narrowband_spectrum(
     list_fs = []
 
     for k in 1:length(list_pth)
+        fs = 1 / timestep(list_pth[k])
+        push!(list_fs, fs)
+    end
+
+    if length(bpf) > 0
+        plot_bpf = true
+    else
+        plot_bpf = false
+        push!(bpf, 62.5)
+    end
+
+
+    if xmin === nothing
+        xmin = minimum([100, minimum(bpf) * 0.5])
+    end
+    if xmax === nothing
+        xmax = maximum(list_fs) / 2.0
+    end
+
+
+    for k in 1:length(list_pth)
         p = pressure(list_pth[k])
         fs = 1 / timestep(list_pth[k])
 
-        push!(list_fs, fs)
+
 
         N = length(p)
 
@@ -255,34 +285,21 @@ function plot_narrowband_spectrum(
             ax[1].plot(f, X_dB, label=label[k], lw=lw, alpha=alpha)
         end
 
-
+        _X_dB = X_dB[(f.>xmin).&(f.<xmax)]
         if ymax === nothing
-            push!(list_ymax, maximum(X_dB) + 0.1 * mean(X_dB))
+            push!(list_ymax, maximum(_X_dB) + 2)
         end
         if ymin === nothing
-            push!(list_ymin, minimum(X_dB) - 0.1 * mean(X_dB))
+            push!(list_ymin, minimum(_X_dB) - 2)
         end
     end
 
-    if length(bpf) > 0
-        plot_bpf = true
-    else
-        plot_bpf = false
-        push!(bpf, 62.5)
-    end
 
     if ymax === nothing
         ymax = maximum(list_ymax)
     end
     if ymin === nothing
         ymin = minimum(list_ymin)
-    end
-
-    if xmin === nothing
-        xmin = minimum([100, minimum(bpf) * 0.5])
-    end
-    if xmax === nothing
-        xmax = maximum(list_fs) / 2.0
     end
 
     if plot_bpf
@@ -448,16 +465,13 @@ function plot_proportional_spectrum(
         label *= f"{OASPL(pth):0.2f} dB"
     end
 
+
+
     psd = PowerSpectralDensityAmplitude(pth)
 
     pbs = ProportionalBandSpectrum(ExactProportionalBands{n}, psd)
     cbands = center_bands(pbs)
     pbs_level = 10 * log10.(pbs / P_REF^2)
-
-    if aweighting
-        pbs_level = dB2dBA.(cbands, pbs_level)
-        pbs_level = clean_data(cbands, pbs_level)
-    end
 
     if xmax === nothing
         xmax = cbands[end]
@@ -465,12 +479,18 @@ function plot_proportional_spectrum(
     if xmin === nothing
         xmin = cbands[1]
     end
+
+    if aweighting
+        pbs_level = dB2dBA.(cbands, pbs_level)
+        pbs_level = clean_data(cbands, pbs_level)
+    end
+
+    _pbs_level = pbs_level[(cbands.>xmin).&(cbands.<xmax)]
     if ymax === nothing
-        ymax = maximum(pbs_level) * 1.1
+        ymax = maximum(_pbs_level) + 2
     end
     if ymin === nothing
-        ymin = maximum([minimum(pbs_level) * 0.9, 0])
-        print([minimum(pbs_level) * 0.9, 0])
+        ymin = maximum([minimum(_pbs_level) - 2, 0])
     end
 
 
@@ -551,6 +571,24 @@ function plot_proportional_spectrum(
     list_ymax = []
     list_ymin = []
 
+    pth1 = list_pth[1]
+    psd1 = PowerSpectralDensityAmplitude(pth1)
+    pbs1 = ProportionalBandSpectrum(ExactProportionalBands{n}, psd1)
+    cbands = center_bands(pbs1)
+    if xmax === nothing
+        push!(list_xmax, cbands[end])
+    else
+        push!(list_xmax, xmax)
+    end
+    if xmin === nothing
+        push!(list_xmin, cbands[1])
+    else
+        push!(list_xmin, xmin)
+    end
+    xmax = maximum(list_xmax)
+    xmin = minimum(list_xmin)
+    xlim = (xmin, xmax)
+
     for i = 1:length(list_pth)
         pth = list_pth[i]
         psd = PowerSpectralDensityAmplitude(pth)
@@ -570,29 +608,20 @@ function plot_proportional_spectrum(
             ax[1].plot(cbands, pbs_level, label=label[i], lw=lw, alpha=alpha)
         end
 
-        if xmax === nothing
-            push!(list_xmax, cbands[end])
-        else
-            push!(list_xmax, xmax)
-        end
-        if xmin === nothing
-            push!(list_xmin, cbands[1])
-        else
-            push!(list_xmin, xmin)
-        end
+        _pbs_level = pbs_level[(cbands.>xmin).&(cbands.<xmax)]
         if ymax === nothing
-            push!(list_ymax, maximum(pbs_level) * 1.1)
+            push!(list_ymax, maximum(_pbs_level) + 2)
         else
             push!(list_ymax, ymax)
         end
         if ymin === nothing
-            push!(list_ymin, maximum([minimum(pbs_level) * 0.9, 0]))
+            push!(list_ymin, maximum([minimum(_pbs_level) - 2, 0]))
         else
             push!(list_ymin, ymin)
         end
     end
 
-    xlim = (minimum(list_xmin), maximum(list_xmax))
+
     ylim = (minimum(list_ymin), maximum(list_ymax))
 
     if title === nothing

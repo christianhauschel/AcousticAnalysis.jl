@@ -10,7 +10,7 @@ n_grid = size(field, 1)
 n_time = size(field, 3)
 n_labels = size(field, 4)
 
-pths_total = Vector{PressureTimeHistory}(undef, n_grid)
+pths_FU = Vector{PressureTimeHistory}(undef, n_grid)
 for i in 1:n_grid 
     # calculate fs 
     t = field[i,1,:,1]
@@ -18,11 +18,11 @@ for i in 1:n_grid
 
     p_total = field[i,1,:,4]
 
-    pths_total[i] = PressureTimeHistory(p_total, 1/fs)
+    pths_FU[i] = PressureTimeHistory(p_total, 1/fs)
 end
 
 # plot_spectrogram(pths_total[1]; ylim=(0, 1000), t_window=0.1)
 
-plot_narrowband_spectrum(pths_total; bpf=100 * ones(n_grid), lw=0.5)
+plot_narrowband_spectrum(pths_FU; bpf=100 * ones(n_grid), lw=0.5)
 
 # plot_history(pths_total; lw=0.5)
