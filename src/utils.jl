@@ -26,3 +26,11 @@ Converts a pressure level to a power level.
 function pressure2power(L_p; r=1, Q=1)
     return L_p .+ abs.(10 * log10.(Q ./ (4π .* r.^2)))
 end
+
+function remove_dc_offset(p::Vector)
+    return p .- mean(p)
+end
+
+function remove_dc_offset(pth::PressureTimeHistory)
+    return PressureTimeHistory(remove_dc_offset(pth.p), timestep(pth), pth.t0)
+end

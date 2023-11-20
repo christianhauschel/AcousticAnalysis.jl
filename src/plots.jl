@@ -353,8 +353,13 @@ function plot_history(
     label=nothing,
     lw=1,
     alpha=1,
+    without_dc_offset=false,
 )
     pplt = pyimport("proplot")
+
+    if without_dc_offset
+        list_pth = remove_dc_offset.(list_pth)
+    end
 
     fig, ax = pplt.subplots(figsize=figsize)
 
@@ -398,7 +403,12 @@ function plot_history(
     label=nothing,
     lw=1,
     alpha=1,
+    without_dc_offset=false,
 )
+    if without_dc_offset
+        pth = remove_dc_offset(pth)
+    end
+
     p = pressure(pth)
     fs = 1 / timestep(pth)
 
