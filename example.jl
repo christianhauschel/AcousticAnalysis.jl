@@ -49,7 +49,7 @@ plot_proportional_spectrum([pth1, pth2]; aweighting=true, fname="out/spectrum_pr
 # algorithm to normalize pth1 to -1...1
 
 pth1 = remove_dc_offset(pth1)
-pth1_norm, _ = normalize(pth1; offset_peak_dB=-1.0)
+ps_norm = normalize([pth1.p, pth2.p]; offset_peak_dB=-1.0)
 
 wavwrite(pth1_norm.p, "out/01.wav", Fs=fs1)
 

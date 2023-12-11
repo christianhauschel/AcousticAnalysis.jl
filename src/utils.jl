@@ -41,7 +41,7 @@ end
 """
 Normalize the pressure time history to -1 or 1
 """
-function normalize(p::Vector; offset_peak_dB=0.0)
+function normalize(p::Vector{Float64}; offset_peak_dB=0.0)
     p_max = maximum(p)
     p_min = minimum(p)
     factor = 1.0
@@ -57,9 +57,9 @@ function normalize(pth::PressureTimeHistory; offset_peak_dB=0.0)
     p, factor = normalize(pth.p; offset_peak_dB=offset_peak_dB)
     return PressureTimeHistory(p, timestep(pth), pth.t0), factor
 end
-function normalize(ps::Vector{Vector{Number}})
+function normalize(ps::Vector{Vector{Float64}}; offset_peak_dB=0.0)
     # calculate factor for each vector
-    factors = [AcousticAnalysis.normalize(p)[2] for p in ps]
+    factors = [AcousticAnalysis.normalize(p; offset_peak_dB=offset_peak_dB)[2] for p in ps]
 
     # find the min factor
     min_factor = minimum(factors)
