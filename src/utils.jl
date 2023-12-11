@@ -27,10 +27,33 @@ function pressure2power(L_p; r=1, Q=1)
     return L_p .+ abs.(10 * log10.(Q ./ (4π .* r.^2)))
 end
 
+
+"""
+Remove the DC offset from a vector.
+"""
 function remove_dc_offset(p::Vector)
     return p .- mean(p)
 end
-
 function remove_dc_offset(pth::PressureTimeHistory)
     return PressureTimeHistory(remove_dc_offset(pth.p), timestep(pth), pth.t0)
+end
+
+"""
+Normalize the pressure time history to -1 or 1
+"""
+function normalize(p::Vector; offset_peak_dB=0.0)
+    p_max = maximum(p)
+    p_min = minimum(p)
+    factor = 1.0
+    if abs(p_max) > abs(p_min)
+        factor = 1/p_max
+    else
+        factor = abs(1/p_min)
+    end
+    factor *= 10^(offset_peak_dB / 10)
+    return p .* factor, factor
+end
+function normalize(pth::PressureTimeHistory; offset_peak_dB=0.0)
+    p, factor = normalize(pth.p; offset_peak_dB=offset_peak_dB)
+    return PressureTimeHistory(p, timestep(pth), pth.t0), factor
 end

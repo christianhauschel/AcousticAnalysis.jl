@@ -19,7 +19,7 @@ include("filter.jl")
 export highpass
 
 include("utils.jl")
-export dbsum, dB, pressure2power
+export dbsum, dB, pressure2power, remove_dc_offset, normalize
 
 include("weighting.jl")
 export dB2dBA, aweighting

@@ -9,11 +9,12 @@ plt = pyimport("matplotlib.pyplot")
 pplt.close("all")
 
 # read wav file
-s1, fs1 = wavread("data/01.wav")
-s2, fs2 = wavread("data/00.wav")
+calibration_factor = 256 * 1e-9
+s1, fs1 = wavread("data/01.wav", format="native")
+s2, fs2 = wavread("data/00.wav", format="native")
 
-s1 = s1[1:end,1]
-s2 = s2[1:end,1]
+s1 = s1[300:end,1] * calibration_factor
+s2 = s2[300:end,1] * calibration_factor
 fs1 = Float64(fs1)
 fs2 = Float64(fs2)
 
@@ -31,9 +32,9 @@ bpf2=100
 # plot_narrowband_spectrum(pth1; bpf=bpf1, fname="out/spectrum_psd.png", type=:psd, aweighting=true)
 # plot_narrowband_spectrum(p2, fs2; bpf=bpf2, fname="out/spectrum_psa.png")
 # plot_narrowband_spectrum([pth1, pth2]; bpf=[bpf1,bpf2], fname="out/spectrum_narrowband.png", label=["00", "01"])
-plot_history([pth1, pth2]; label=["1", "2"], fname="out/time_history.png", without_dc_offset=true)
+# plot_history([pth1, pth2]; label=["1", "2"], fname="out/time_history.png", without_dc_offset=true)
 # plot_proportional_spectrum(pth2; aweighting=false)
-# plot_proportional_spectrum([pth1, pth2]; aweighting=true, fname="out/spectrum_proportional_A.png", label=["1", "2"], alpha=0.5, lw=2)
+plot_proportional_spectrum([pth1, pth2]; aweighting=true, fname="out/spectrum_proportional_A.png", label=["1", "2"], alpha=0.5, lw=2)
 
 # OASPL(pth1)
 
@@ -45,6 +46,12 @@ plot_history([pth1, pth2]; label=["1", "2"], fname="out/time_history.png", witho
 # plot_narrowband_spectrum(pth1)
 # plot_narrowband_spectrum([pth1, pth1_A], label=[f"{OASPL(pth1):0.2f} dB", f"{OASPL(pth1_A):0.2f} dB(A)"], fname="out/spectrum_narrow.png")
 
+# algorithm to normalize pth1 to -1...1
+
+pth1 = remove_dc_offset(pth1)
+pth1_norm, _ = normalize(pth1; offset_peak_dB=-1.0)
+
+wavwrite(pth1_norm.p, "out/01.wav", Fs=fs1)
 
 # L_p = OASPL(pth1)
 # L_W = pressure2power(L_p; r=1, Q=1)
