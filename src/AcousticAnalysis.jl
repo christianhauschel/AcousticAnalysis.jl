@@ -15,6 +15,9 @@ export PressureTimeHistory, pressure, time, timestep, starttime, frequency, OASP
 P_REF = 20e-6
 export P_REF
 
+include("spectrum.jl")
+export narrowband_spectrum
+
 include("filter.jl")
 export highpass
 

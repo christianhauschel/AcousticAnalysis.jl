@@ -53,6 +53,9 @@ ps_norm = normalize([pth1.p, pth2.p]; offset_peak_dB=-1.0)
 
 wavwrite(pth1_norm.p, "out/01.wav", Fs=fs1)
 
+
+f, X_dB, X_ss_final = narrowband_spectrum(pth1; type=:psd, aweighting=true)
+
 # L_p = OASPL(pth1)
 # L_W = pressure2power(L_p; r=1, Q=1)
 
