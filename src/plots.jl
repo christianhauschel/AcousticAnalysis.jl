@@ -100,36 +100,9 @@ function plot_narrowband_spectrum(
         label *= f"{OASPL(pth):0.2f} dB"
     end
 
-    N = length(p)
-    if window == :hanning
-        window = DSP.hanning(N)
-    elseif window === nothing
-        window = ones(N)
-    end
-    p_win = p .* window
-    X = fft(p_win)
-
-    n_freq = div(N, 2) + 1
-    f_nyquist = fs / 2.0
-    f = LinRange(0, f_nyquist, n_freq)
-    Δf = f[2] - f[1]
-
-    X_ss = X[1:div(N, 2)+1]
-    X_ss *= 2
-    X_ss[1] = X_ss[1] / 2.0
-
-    if type == :amplitude
-        X_ss_amp = abs.(X_ss) / sum(window)
-        X_dB = 20.0 * log10.(X_ss_amp / P_REF)
-    else
-        X_psd = abs2.(X_ss) / (fs * sum(window .^ 2))
-        X_dB = 10.0 * log10.(X_psd * Δf / P_REF^2)
-    end
-
-    if aweighting
-        X_dB = dB2dBA.(f, X_dB)
-        X_dB = clean_data(f, X_dB)
-    end
+    f, X_dB, _ = narrowband_spectrum(
+        pth; type=type, aweighting=aweighting, window=window
+    )
 
 
     pplt = pyimport("proplot")
@@ -244,40 +217,10 @@ function plot_narrowband_spectrum(
         p = pressure(list_pth[k])
         fs = 1 / timestep(list_pth[k])
 
-
-
-        N = length(p)
-
-
-        if window == :hanning
-            _window = DSP.hanning(N)
-        elseif window === nothing
-            _window = ones(N)
-        end
-        p_win = p .* _window
-        X = fft(p_win)
-
-        n_freq = div(N, 2) + 1
-        f_nyquist = fs / 2.0
-        f = LinRange(0, f_nyquist, n_freq)
-        Δf = f[2] - f[1]
-
-        X_ss = X[1:div(N, 2)+1]
-        X_ss *= 2
-        X_ss[1] = X_ss[1] / 2.0
-
-        if type == :amplitude
-            X_ss_amp = abs.(X_ss) / sum(_window)
-            X_dB = 20.0 * log10.(X_ss_amp / P_REF)
-        else
-            X_psd = abs2.(X_ss) / (fs * sum(_window .^ 2))
-            X_dB = 10.0 * log10.(X_psd * Δf / P_REF^2)
-        end
-
-        if aweighting
-            X_dB = dB2dBA.(f, X_dB)
-            X_dB = clean_data(f, X_dB)
-        end
+        f, X_dB, _ = narrowband_spectrum(
+            p, fs; type=type, aweighting=aweighting, window=window
+        )
+        
 
         if label === nothing
             ax[1].plot(f, X_dB, lw=lw, alpha=alpha)
@@ -447,7 +390,7 @@ function plot_history(
     return fig
 end
 
-function plot_proportional_spectrum(
+function plot_propband_spectrum(
     pth::PressureTimeHistory;
     n=3,
     aweighting=false,
@@ -475,13 +418,8 @@ function plot_proportional_spectrum(
         label *= f"{OASPL(pth):0.2f} dB"
     end
 
+    cbands, pbs_level, _ = propband_spectrum(pth; aweighting=aweighting)
 
-
-    psd = PowerSpectralDensityAmplitude(pth)
-
-    pbs = ProportionalBandSpectrum(ExactProportionalBands{n}, psd)
-    cbands = center_bands(pbs)
-    pbs_level = 10 * log10.(pbs / P_REF^2)
 
     if xmax === nothing
         xmax = cbands[end]
@@ -489,12 +427,6 @@ function plot_proportional_spectrum(
     if xmin === nothing
         xmin = cbands[1]
     end
-
-    if aweighting
-        pbs_level = dB2dBA.(cbands, pbs_level)
-        pbs_level = clean_data(cbands, pbs_level)
-    end
-
     _pbs_level = pbs_level[(cbands.>xmin).&(cbands.<xmax)]
     if ymax === nothing
         ymax = maximum(_pbs_level) + 2
@@ -555,7 +487,7 @@ function plot_proportional_spectrum(
 
     return fig
 end
-function plot_proportional_spectrum(
+function plot_propband_spectrum(
     list_pth::Vector;
     n=3,
     aweighting=false,
@@ -581,10 +513,8 @@ function plot_proportional_spectrum(
     list_ymax = []
     list_ymin = []
 
-    pth1 = list_pth[1]
-    psd1 = PowerSpectralDensityAmplitude(pth1)
-    pbs1 = ProportionalBandSpectrum(ExactProportionalBands{n}, psd1)
-    cbands = center_bands(pbs1)
+    cbands, _,_ = propband_spectrum(list_pth[1]; aweighting=aweighting)
+
     if xmax === nothing
         push!(list_xmax, cbands[end])
     else
@@ -601,16 +531,7 @@ function plot_proportional_spectrum(
 
     for i = 1:length(list_pth)
         pth = list_pth[i]
-        psd = PowerSpectralDensityAmplitude(pth)
-
-        pbs = ProportionalBandSpectrum(ExactProportionalBands{n}, psd)
-        cbands = center_bands(pbs)
-        pbs_level = 10 * log10.(pbs / P_REF^2)
-
-        if aweighting
-            pbs_level = dB2dBA.(cbands, pbs_level)
-            pbs_level = clean_data(cbands, pbs_level)
-        end
+        cbands, pbs_level, _ = propband_spectrum(pth; aweighting=aweighting)
 
         if label === nothing
             ax[1].plot(cbands, pbs_level, lw=lw, alpha=alpha)

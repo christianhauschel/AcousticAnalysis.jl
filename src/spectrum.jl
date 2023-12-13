@@ -1,4 +1,12 @@
-function narrowband_spectrum(p::Vector, fs::Number; window=:hanning, type=:amplitude, aweighting=false)
+"""
+Calculates the narrowband spectrum of a signal.
+
+# Returns
+f, X_dB, X_ss
+"""
+function narrowband_spectrum(
+    p::Vector, fs::Number; window=:hanning, type=:amplitude, aweighting=false
+)
     N = length(p)
     if window == :hanning
         window = DSP.hanning(N)
@@ -32,6 +40,37 @@ function narrowband_spectrum(p::Vector, fs::Number; window=:hanning, type=:ampli
 
     return f, X_dB, X_ss
 end
-function narrowband_spectrum(p::PressureTimeHistory; window=:hanning, type=:amplitude, aweighting=false)
-    return narrowband_spectrum(p.p, 1.0/p.dt; window=window, type=type, aweighting=aweighting)
+function narrowband_spectrum(
+    pth::PressureTimeHistory; window=:hanning, type=:amplitude, aweighting=false
+)
+    return narrowband_spectrum(pth.p, 1.0 / pth.dt; window=window, type=type, aweighting=aweighting)
+end
+
+"""
+Calculates the n-proportional spectrum of a signal.
+
+# Returns 
+f_center_bands, pbs_dB, pbs
+"""
+function propband_spectrum(
+    p::Vector, fs; n=3, aweighting=false
+)
+    pth = PressureTimeHistory(p, 1 / fs)
+    return propband_spectrum(pth; n=n, aweighting=aweighting)
+end
+function propband_spectrum(
+    pth::PressureTimeHistory; n=3, aweighting=false
+)
+
+    psd = PowerSpectralDensityAmplitude(pth)
+    pbs = ProportionalBandSpectrum(ExactProportionalBands{n}, psd)
+    f_center_bands = center_bands(pbs)
+    pbs_dB = 10 * log10.(pbs / P_REF^2)
+
+    if aweighting
+        pbs_dB = dB2dBA.(f_center_bands, pbs_dB)
+        pbs_dB = clean_data(f_center_bands, pbs_dB)
+    end
+
+    return f_center_bands, pbs_dB, pbs
 end

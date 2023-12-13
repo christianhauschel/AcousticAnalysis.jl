@@ -16,7 +16,10 @@ P_REF = 20e-6
 export P_REF
 
 include("spectrum.jl")
-export narrowband_spectrum
+export narrowband_spectrum, propband_spectrum
+
+include("msst.jl")
+export msst
 
 include("filter.jl")
 export highpass
@@ -28,9 +31,8 @@ include("weighting.jl")
 export dB2dBA, aweighting
 
 include("plots.jl")
-export plot_narrowband_spectrum, plot_spectrogram, plot_history, plot_proportional_spectrum
+export plot_narrowband_spectrum, plot_spectrogram, plot_history, plot_propband_spectrum
 
-include("msst.jl")
-export msst
+
 
 end
