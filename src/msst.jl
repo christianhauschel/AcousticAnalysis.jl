@@ -1,8 +1,8 @@
 using LinearAlgebra
 using FFTW
 using Statistics
-using DSP
 using Base.Threads
+using Roots
 
 """
     msst(pth::PressureTimeHistory, length_window::Int, n_iterations::Int)
@@ -28,7 +28,7 @@ Expression (31)-based Algorithm [1].
     Sound and Vibration, vol. 492, p. 115813, Oct. 2020,
     doi: 10.1016/j.jsv.2020.115813.
 """
-function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 512)
+function _msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int=512)
 
     x = pressure(pth)
 
@@ -37,7 +37,7 @@ function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 
     ht = LinRange(-0.5, 0.5, hlength)
 
     # Gaussian window
-    h = exp.(-π / 0.32^2 .* ht.^2)
+    h = exp.(-π / 0.32^2 .* ht .^ 2)
     hrow = length(h)
     Lh = div(hrow - 1, 2)
     N = xrow
@@ -58,14 +58,14 @@ function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 
     # t0 = time()
     for icol in 1:tcol
         ti = t[icol]
-        tau = -min(round(Int, N / 2) - 1, Lh, ti - 1):min(round(Int, N / 2) - 1, Lh, xrow - ti) 
+        tau = -min(round(Int, N / 2) - 1, Lh, ti - 1):min(round(Int, N / 2) - 1, Lh, xrow - ti)
         indices = mod.(N .+ tau, N) .+ 1
 
-        rSig = x[ti .+ tau]
+        rSig = x[ti.+tau]
 
-        tfr[indices, icol] = rSig .* conj.(h[Lh .+ tau .+ 1])
+        tfr[indices, icol] = rSig .* conj.(h[Lh.+tau.+1])
     end
-    
+
 
     tfr = fft(tfr, 1)[1:n_half, :]
 
@@ -76,7 +76,7 @@ function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 
     for i in 1:n_half
         omega[i, 1:end-1] = diff(unwrap(angle.(tfr[i, :]))) .* N / 2 / π
     end
-   
+
 
     omega = round.(Int, omega)
 
@@ -87,7 +87,7 @@ function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 
     # ---------------------------------
     # t0 = time()
     if n_iterations > 1
-        for kk in 1:n_iterations - 1
+        for kk in 1:n_iterations-1
             for b in 1:nb
                 for eta in 1:neta
                     k = Int(omega[eta, b])
@@ -101,7 +101,7 @@ function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 
     else
         omega2 = copy(omega)
     end
-  
+
 
     # ---------------------------------
     # Block 3 (12 s)
@@ -117,7 +117,7 @@ function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 
             end
         end
     end
-  
+
 
     # STFT = tfr / (N / 2)
     MSST = Ts / (N / 2)
@@ -125,3 +125,44 @@ function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 
     return MSST
 end
 
+function msst(p::Vector, t::Vector; fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0)
+    fs = 1 / (t[2] - t[1])
+
+    if fs_resample === nothing
+        fs_resample = fs
+    end
+    p_resampled, t_resampled = resample(p, fs, fs_resample; t0=t[1])
+
+    """
+    Empirical function to predict RAM usage given n.
+    """
+    function predict_ram(n)
+        return (0.0001n^2 + 0.0164n + 7.6607) / 1000
+    end
+
+    """
+    Empirical function to predict n given the RAM.
+    """
+    function predict_n(ram)
+        f = n -> predict_ram(n) - ram
+        return find_zero(f, 1000)
+    end
+
+
+    if predict_ram(length(p_resampled)) > max_ram
+        n_max = round(Int, predict_n(max_ram))
+        p_resampled = p_resampled[1:n_max]
+
+        println(f"Warning: RAM usage is predicted to be greater than {max_ram} GB. Restricting signal size to {n_max} samples.")
+    end
+
+
+    pth = PressureTimeHistory(p_resampled, 1 / fs_resample, t[1])
+
+    MSST = _msst(pth, n_iterations; length_window=length_window)
+
+    return MSST, t_resampled, p_resampled
+end
+function msst(pth::PressureTimeHistory; fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0)
+    return msst(pth.p, Vector(time(pth)); fs_resample=fs_resample, n_iterations=n_iterations, length_window=length_window, max_ram=max_ram)
+end

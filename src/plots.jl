@@ -220,7 +220,7 @@ function plot_narrowband_spectrum(
         f, X_dB, _ = narrowband_spectrum(
             p, fs; type=type, aweighting=aweighting, window=window
         )
-        
+
 
         if label === nothing
             ax[1].plot(f, X_dB, lw=lw, alpha=alpha)
@@ -513,7 +513,7 @@ function plot_propband_spectrum(
     list_ymax = []
     list_ymin = []
 
-    cbands, _,_ = propband_spectrum(list_pth[1]; aweighting=aweighting)
+    cbands, _, _ = propband_spectrum(list_pth[1]; aweighting=aweighting)
 
     if xmax === nothing
         push!(list_xmax, cbands[end])
@@ -593,4 +593,99 @@ function plot_propband_spectrum(
     end
 
     return fig
+end
+
+
+# ==============================================================================
+# MSST 
+# ==============================================================================
+
+function plot_msst(
+    MSST::Matrix,
+    t::Vector;
+    y_min=nothing,
+    y_max=nothing,
+    noise_floor_dB=0.0,
+    figsize=(6, 3.7),
+    rasterized=true,
+    fname=nothing,
+    tight_layout=true,
+)
+    fs = 1 / (t[2] - t[1])
+
+    T_msst_plot = 20.0 * log10.(abs.(MSST) / P_REF)
+    T_msst_plot_min = nanminimum(T_msst_plot)
+    T_msst_plot = ifelse.(isinf.(T_msst_plot), noise_floor_dB, T_msst_plot)
+
+
+    f_msst = Vector(LinRange(0, fs / 2, size(MSST, 1)))
+
+    fig, ax = plt.subplots(figsize=figsize, tight_layout=tight_layout)
+
+    if y_min === nothing
+        y_min = f_msst[1]
+    end
+    if y_max === nothing
+        y_max = f_msst[end]
+    end
+
+    mesh = ax.pcolorfast(
+        t,
+        f_msst,
+        T_msst_plot,
+        vmin=maximum([T_msst_plot_min, noise_floor_dB]),
+        vmax=maximum(T_msst_plot),
+        rasterized=rasterized,
+    )
+
+    cbar = fig.colorbar(mesh, ax=ax, label="dB")
+    ax.set(
+        ylim=(y_min, y_max),
+        title="MSST",
+        xlabel="t [s]",
+        ylabel="f [Hz]",
+    )
+
+    if fname !== nothing
+        fig.savefig(fname)
+    end
+
+    return fig
+end
+function plot_msst(
+    pth::PressureTimeHistory;
+    y_min=nothing,
+    y_max=nothing,
+    noise_floor_dB=0.0,
+    figsize=(6, 3.7),
+    rasterized=true,
+    fname=nothing,
+    tight_layout=true,
+    fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0
+)
+    MSST, t, _ = msst(pth; fs_resample=fs_resample, n_iterations=n_iterations, length_window=length_window, max_ram=max_ram)
+    return plot_msst(
+        MSST, t; 
+        y_min=y_min, y_max=y_max, noise_floor_dB=noise_floor_dB, 
+        figsize=figsize, rasterized=rasterized, fname=fname, tight_layout=tight_layout
+    )
+end
+function plot_msst(
+    p::Vector,
+    t::Vector;
+    y_min=nothing,
+    y_max=nothing,
+    noise_floor_dB=0.0,
+    figsize=(6, 3.7),
+    rasterized=true,
+    fname=nothing,
+    tight_layout=true,
+    fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0
+)
+    MSST, t, _ = msst(p, t; fs_resample=fs_resample, n_iterations=n_iterations, length_window=length_window, max_ram=max_ram)
+    return plot_msst(
+        MSST,t; 
+        y_min=y_min, y_max=y_max, noise_floor_dB=noise_floor_dB, 
+        figsize=figsize, rasterized=rasterized, fname=fname, tight_layout=tight_layout
+    )
 end
