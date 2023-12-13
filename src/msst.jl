@@ -43,6 +43,7 @@ function msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int = 
     N = xrow
     t = 1:xrow
     tcol = length(t)
+
     tfr = zeros(ComplexF64, tcol, tcol)
 
     n_half = round(Int, N / 2)
