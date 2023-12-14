@@ -5,7 +5,9 @@ version = "0.1.0"
 
 [deps]
 AcousticMetrics = "046f749b-9c1e-43ca-86bc-6902340f753e"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 FLOWMath = "6cb5d3fb-0fe8-4cc2-bd89-9fe0b19a99d3"
 FLOWNoise = "d27480ee-285d-533b-ae3d-5018956ae0bc"

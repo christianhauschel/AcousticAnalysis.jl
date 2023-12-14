@@ -26,24 +26,47 @@ function plot_spectrogram(
     figsize=(6, 5),
     t_window=0.05,
     onesided=true,
+    noise_floor_dB=-50.0,
     title="Spectrogram",
-    ylim=nothing
+    x_min = nothing,
+    x_max = nothing,
+    y_min = 0.0,
+    y_max=nothing,
 )
     p = pressure(pth)
     fs = 1 / timestep(pth)
 
     pplt = pyimport("proplot")
     spectro = spectrogram(p / P_REF, Int(round(fs * t_window)); fs=fs, onesided=onesided)
-
+    power_dB = 10 * log10.(spectro.power)
 
     fig, ax = pplt.subplots(figsize=figsize)
-    cm = ax[1].pcolormesh(spectro.time, spectro.freq, 10 * log10.(spectro.power))
+    cm = ax[1].pcolormesh(
+        spectro.time, 
+        spectro.freq, 
+        power_dB,
+        vmin=nanmaximum([nanminimum(power_dB), noise_floor_dB]),
+        vmax=nanmaximum(power_dB),
+    )
     cb = plt.colorbar(cm, label="Power [dB]")
-    if ylim !== nothing
-        ax[1].set(ylim=ylim)
-    else
-        ax[1].set(ylim=(0, fs / 2))
+    
+    if x_min === nothing
+        x_min = spectro.time[1]
     end
+    if x_max === nothing
+        x_max = spectro.time[end]
+    end
+
+    if y_max === nothing
+        y_max = fs/2
+    end
+    if y_min === nothing
+        y_min = 0.0
+    end
+    ax[1].set(
+        ylim = (y_min, y_max),
+        xlim = (x_min, x_max),
+    )
     ax[1].set(
         xlabel="t [s]",
         ylabel="f [Hz]",
