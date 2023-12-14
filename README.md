@@ -9,6 +9,8 @@
 <img src="doc/img/spectrogram.png" width=500></img>
 
 ### Multisynchrosqueezing Transform
+<img src="doc/img/hist_msst.png" width=500></img>
+<img src="doc/img/spectro_msst.png" width=500></img>
 <img src="doc/img/msst.png" width=500></img>
 
 ## Installation
