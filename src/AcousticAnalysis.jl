@@ -7,7 +7,7 @@ using PyFormattedStrings
 using FFTW
 using AcousticMetrics
 using AcousticMetrics: starttime, timestep, time, pressure, frequency, halfcomplex, W_A, AbstractNarrowbandSpectrum, OASPL
-using AcousticMetrics: PowerSpectralDensityAmplitude, MSPSpectrumAmplitude, ProportionalBandSpectrum, ExactProportionalBands, center_bands, lower_bands, upper_bands
+using AcousticMetrics: PowerSpectralDensityAmplitude, MSPSpectrumAmplitude, ProportionalBandSpectrum, ExactProportionalBands, center_bands, lower_bands, upper_bands, AbstractPressureTimeHistory
 using FLOWMath: linear
 
 P_REF = 20e-6
@@ -36,6 +36,7 @@ export dB2dBA, aweighting
 include("plots.jl")
 export plot_narrowband_spectrum, plot_spectrogram, plot_history, plot_propband_spectrum, plot_msst
 
-
+include("io.jl")
+export save_h5, load_h5, load_wav, save_wav
 
 end

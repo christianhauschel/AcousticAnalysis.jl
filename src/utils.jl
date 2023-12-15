@@ -6,7 +6,7 @@ function dbsum(levels::Vector)
     return 10 * log10(sum(10 .^ (levels / 10)))
 end
 
-function dB(p; prefix = 20, P_REF=20e-6)
+function dB(p; prefix=20, P_REF=20e-6)
     return prefix * log10.(p ./ P_REF)
 end
 
@@ -24,7 +24,7 @@ Converts a pressure level to a power level.
 [1] https://www.linkedin.com/pulse/acoustics-spl-vs-swl-sound-pressure-level-power-chris-jones/
 """
 function pressure2power(L_p; r=1, Q=1)
-    return L_p .+ abs.(10 * log10.(Q ./ (4π .* r.^2)))
+    return L_p .+ abs.(10 * log10.(Q ./ (4π .* r .^ 2)))
 end
 
 
@@ -46,9 +46,9 @@ function normalize(p::Vector{Float64}; offset_peak_dB=0.0)
     p_min = minimum(p)
     factor = 1.0
     if abs(p_max) > abs(p_min)
-        factor = 1/p_max
+        factor = 1 / p_max
     else
-        factor = abs(1/p_min)
+        factor = abs(1 / p_min)
     end
     factor *= 10^(offset_peak_dB / 10)
     return p .* factor, factor
@@ -57,6 +57,11 @@ function normalize(pth::PressureTimeHistory; offset_peak_dB=0.0)
     p, factor = normalize(pth.p; offset_peak_dB=offset_peak_dB)
     return PressureTimeHistory(p, timestep(pth), pth.t0), factor
 end
+"""
+Normalizes a vector of pressure time histories to -1 or 1.
+
+Uses the minimal factor of all pressures, such that the signals are comparable.
+"""
 function normalize(ps::Vector{Vector{Float64}}; offset_peak_dB=0.0)
     # calculate factor for each vector
     factors = [AcousticAnalysis.normalize(p; offset_peak_dB=offset_peak_dB)[2] for p in ps]
@@ -65,5 +70,15 @@ function normalize(ps::Vector{Vector{Float64}}; offset_peak_dB=0.0)
     min_factor = minimum(factors)
 
     # normalize based on min factor 
-    return [p .* min_factor for p in ps]    
+    return [p .* min_factor for p in ps]
+end
+function normalize(pths::Vector{PressureTimeHistory{true, Vector{Float64}, Float64, Float64}}; offset_peak_dB=0.0)
+    ps = [pth.p for pth in pths]
+    ps = normalize(ps; offset_peak_dB=offset_peak_dB)
+    return [PressureTimeHistory(p, timestep(pths[1]), pths[1].t0) for p in ps]
+end
+function normalize(pths::Vector{PressureTimeHistory{false, Vector{Float64}, Float64, Float64}}; offset_peak_dB=0.0)
+    ps = [pth.p for pth in pths]
+    ps = normalize(ps; offset_peak_dB=offset_peak_dB)
+    return [PressureTimeHistory(p, timestep(pths[1]), pths[1].t0) for p in ps]
 end
