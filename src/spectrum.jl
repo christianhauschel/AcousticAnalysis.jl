@@ -4,7 +4,7 @@ Calculates the narrowband spectrum of a signal.
 # Returns
 f, X_dB, X_ss
 """
-function narrowband_spectrum(
+function _narrowband_spectrum(
     p::Vector, fs::Number; window=:hanning, type=:amplitude, aweighting=false
 )
     N = length(p)
@@ -41,9 +41,9 @@ function narrowband_spectrum(
     return f, X_dB, X_ss
 end
 function narrowband_spectrum(
-    pth::PressureTimeHistory; window=:hanning, type=:amplitude, aweighting=false
+    pth::AbstractPressureTimeHistory; window=:hanning, type=:amplitude, aweighting=false
 )
-    return narrowband_spectrum(pth.p, 1.0 / pth.dt; window=window, type=type, aweighting=aweighting)
+    return _narrowband_spectrum(pth.p, 1.0 / pth.dt; window=window, type=type, aweighting=aweighting)
 end
 
 """
@@ -52,14 +52,14 @@ Calculates the n-proportional spectrum of a signal.
 # Returns 
 f_center_bands, pbs_dB, pbs
 """
-function propband_spectrum(
+function _propband_spectrum(
     p::Vector, fs; n=3, aweighting=false
 )
     pth = PressureTimeHistory(p, 1 / fs)
     return propband_spectrum(pth; n=n, aweighting=aweighting)
 end
 function propband_spectrum(
-    pth::PressureTimeHistory; n=3, aweighting=false
+    pth::AbstractPressureTimeHistory; n=3, aweighting=false
 )
 
     psd = PowerSpectralDensityAmplitude(pth)

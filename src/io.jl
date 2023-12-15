@@ -6,7 +6,7 @@ Save a `PressureTimeHistory` to an HDF5 file. If `group` is specified, the
 `PressureTimeHistory` will be saved to a group in the HDF5 file. Otherwise, it
 will be saved to the root of the file.
 """
-function save_h5(pth::PressureTimeHistory, fname::String; group=nothing, mode="w")
+function save_h5(pth::AbstractPressureTimeHistory, fname::String; group=nothing, mode="w")
     h5open(fname, mode) do f
         if group !== nothing
             g = create_group(f, group)
@@ -37,7 +37,7 @@ Load a `PressureTimeHistory` from an HDF5 file. If `group` is specified, the
 `PressureTimeHistory` will be loaded from a group in the HDF5 file. Otherwise,
 it will be loaded from the root of the file.
 """
-function load_h5(fname; group=nothing)::PressureTimeHistory
+function load_h5(fname; group=nothing)::AbstractPressureTimeHistory
     p = nothing
     t0 = nothing
     dt = nothing
@@ -70,7 +70,7 @@ end
 """
 Load a `PressureTimeHistory` from a WAV file.
 """
-function load_wav(fname; calibration_factor=2.56e-7, t0=0.0)::PressureTimeHistory
+function load_wav(fname; calibration_factor=2.56e-7, t0=0.0)::AbstractPressureTimeHistory
     p, fs = wavread(fname, format="native")
     p *= calibration_factor
     dt = 1 / fs
@@ -80,10 +80,10 @@ end
 """
 Save a pressure vector to a WAV file.
 """
-save_wav(p::Vector, fs, fname::String) = wavwrite(p, fname, Fs=fs)
+_save_wav(p::Vector, fs, fname::String) = wavwrite(p, fname, Fs=fs)
 """
 Save a `PressureTimeHistory` to a WAV file.
 """
-function save_wav(pth::PressureTimeHistory, fname::String)
-    save_wav(pth.p, 1/pth.dt, fname)
+function save_wav(pth::AbstractPressureTimeHistory, fname::String)
+    _save_wav(pth.p, 1/pth.dt, fname)
 end

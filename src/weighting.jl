@@ -6,16 +6,16 @@ function dB2dBA(f, dB)
 end
 
 """
-    aweighting(pth)
-
 Compute the A-weighted time history of a pressure time history.
 """
-function aweighting(pth::PressureTimeHistory)::PressureTimeHistory
-    p = pressure(pth)
-    fs = 1 / timestep(pth)
+function aweighting(pth::AbstractPressureTimeHistory)::AbstractPressureTimeHistory
+    return _aweighting(pth.p, 1/pth.dt)
+end
 
+"""
+Compute the A-weighted time history of a pressure vector.
+"""
+function _aweighting(p::Vector, fs)::Vector
     wa = pyimport("waveform_analysis") # TODO: Julia solution
-
-    pA = wa.weighting_filters.A_weight(p, fs)
-    return PressureTimeHistory(pA, 1/fs)
+    return wa.weighting_filters.A_weight(p, fs)
 end

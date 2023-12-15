@@ -5,13 +5,13 @@ using Base.Threads
 using Roots
 
 """
-    msst(pth::PressureTimeHistory, length_window::Int, n_iterations::Int)
+    msst(pth::AbstractPressureTimeHistory, length_window::Int, n_iterations::Int)
 
 Computes the multisynchrosqueezing transform (MSST) of the signal using the 
 Expression (31)-based Algorithm [1].
 
 # Arguments
-- `pth::PressureTimeHistory`: Pressure time history
+- `pth::AbstractPressureTimeHistory`: Pressure time history
 - `length_window::Int`: Length of the window function
 - `n_iterations::Int`: Number of iterations
 
@@ -28,10 +28,10 @@ Expression (31)-based Algorithm [1].
     Sound and Vibration, vol. 492, p. 115813, Oct. 2020,
     doi: 10.1016/j.jsv.2020.115813.
 """
-function _msst(pth::PressureTimeHistory, n_iterations::Int; length_window::Int=512)
-    return _msst(pth.p, n_iterations; length_window=length_window)
+function msst_core(pth::AbstractPressureTimeHistory, n_iterations::Int; length_window::Int=512)
+    return _msst_core(pth.p, n_iterations; length_window=length_window)
 end
-function _msst(x::Vector, n_iterations::Int; length_window::Int=512)
+function _msst_core(x::Vector, n_iterations::Int; length_window::Int=512)
 
     N = length(x)
     hlength = length_window + 1 - length_window % 2
@@ -48,7 +48,7 @@ function _msst(x::Vector, n_iterations::Int; length_window::Int=512)
     n_half = round(Int, N / 2)
 
     tfr = zeros(ComplexF64, N, tcol)
-    omega = zeros(Float64, n_half, tcol-1)
+    omega = zeros(Float64, n_half, tcol - 1)
     omega2 = zeros(Int64, n_half, tcol)
     Ts = zeros(ComplexF64, n_half, tcol)
 
@@ -103,7 +103,7 @@ function _msst(x::Vector, n_iterations::Int; length_window::Int=512)
     # ---------------------------------
     # t0 = time()
 
-    
+
 
     if n_iterations > 1
         for kk = 1:n_iterations-1
@@ -147,13 +147,13 @@ function _msst(x::Vector, n_iterations::Int; length_window::Int=512)
 end
 
 
-function msst(p::Vector, t::Vector; fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0)
+function _msst(p::Vector, t::Vector; fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0)
     fs = 1 / (t[2] - t[1])
 
     if fs_resample === nothing
         fs_resample = fs
     end
-    p_resampled, t_resampled = resample(p, fs, fs_resample; t0=t[1])
+    p_resampled, t_resampled = _resample(p, fs, fs_resample; t0=t[1])
 
     """
     Empirical function to predict RAM usage given n.
@@ -181,10 +181,10 @@ function msst(p::Vector, t::Vector; fs_resample=nothing, n_iterations=4, length_
 
     pth = PressureTimeHistory(p_resampled, 1 / fs_resample, t[1])
 
-    MSST = _msst(pth, n_iterations; length_window=length_window)
+    MSST = msst_core(pth, n_iterations; length_window=length_window)
 
     return MSST, t_resampled, p_resampled
 end
-function msst(pth::PressureTimeHistory; fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0)
-    return msst(pth.p, Vector(time(pth)); fs_resample=fs_resample, n_iterations=n_iterations, length_window=length_window, max_ram=max_ram)
+function msst(pth::AbstractPressureTimeHistory; fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0)
+    return _msst(pth.p, Vector(time(pth)); fs_resample=fs_resample, n_iterations=n_iterations, length_window=length_window, max_ram=max_ram)
 end

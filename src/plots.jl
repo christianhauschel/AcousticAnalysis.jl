@@ -20,7 +20,7 @@ function clean_data(x, y)
 end
 
 function plot_spectrogram(
-    pth::PressureTimeHistory;
+    pth::AbstractPressureTimeHistory;
     fname=nothing,
     dpi=300,
     figsize=(6, 5),
@@ -79,7 +79,7 @@ function plot_spectrogram(
 end
 
 function plot_narrowband_spectrum(
-    pth::PressureTimeHistory;
+    pth::AbstractPressureTimeHistory;
     fname=nothing,
     dpi=300,
     figsize=(6, 3),
@@ -240,7 +240,7 @@ function plot_narrowband_spectrum(
         p = pressure(list_pth[k])
         fs = 1 / timestep(list_pth[k])
 
-        f, X_dB, _ = narrowband_spectrum(
+        f, X_dB, _ = _narrowband_spectrum(
             p, fs; type=type, aweighting=aweighting, window=window
         )
 
@@ -358,7 +358,7 @@ function plot_history(
     return fig
 end
 function plot_history(
-    pth::PressureTimeHistory;
+    pth::AbstractPressureTimeHistory;
     t=nothing,
     title="Time History",
     fname=nothing,
@@ -414,7 +414,7 @@ function plot_history(
 end
 
 function plot_propband_spectrum(
-    pth::PressureTimeHistory;
+    pth::AbstractPressureTimeHistory;
     n=3,
     aweighting=false,
     figsize=(6, 3),
@@ -676,7 +676,7 @@ function plot_msst(
     return fig
 end
 function plot_msst(
-    pth::PressureTimeHistory;
+    pth::AbstractPressureTimeHistory;
     y_min=nothing,
     y_max=nothing,
     noise_floor_dB=0.0,
@@ -705,7 +705,7 @@ function plot_msst(
     tight_layout=true,
     fs_resample=nothing, n_iterations=4, length_window=256, max_ram=3.0
 )
-    MSST, t, _ = msst(p, t; fs_resample=fs_resample, n_iterations=n_iterations, length_window=length_window, max_ram=max_ram)
+    MSST, t, _ = _msst(p, t; fs_resample=fs_resample, n_iterations=n_iterations, length_window=length_window, max_ram=max_ram)
     return plot_msst(
         MSST,t; 
         y_min=y_min, y_max=y_max, noise_floor_dB=noise_floor_dB, 

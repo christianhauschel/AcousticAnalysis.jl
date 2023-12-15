@@ -16,27 +16,27 @@ export P_REF
 export PressureTimeHistory, pressure, time, timestep, starttime, frequency, OASPL
 
 include("signal.jl")
-export resample, time_range
+export resample, time_range, _resample, _time_range
 
 include("spectrum.jl")
-export narrowband_spectrum, propband_spectrum
+export narrowband_spectrum, propband_spectrum, _narrowband_spectrum, _propband_spectrum
 
 include("msst.jl")
-export msst
+export msst, _msst
 
 include("filter.jl")
-export highpass
+export highpass, _highpass
 
 include("utils.jl")
-export dbsum, dB, pressure2power, remove_dc_offset, normalize
+export dbsum, dB, pressure2power, remove_dc_offset, normalize, _normalize, _remove_dc_offset
 
 include("weighting.jl")
-export dB2dBA, aweighting
+export dB2dBA, aweighting, _aweighting
 
 include("plots.jl")
 export plot_narrowband_spectrum, plot_spectrogram, plot_history, plot_propband_spectrum, plot_msst
 
 include("io.jl")
-export save_h5, load_h5, load_wav, save_wav
+export save_h5, load_h5, load_wav, save_wav, _save_wav
 
 end

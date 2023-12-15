@@ -28,7 +28,7 @@ n = 10
 t = Vector(LinRange(0, 1, n))
 p = sin.(2π * 10 * t)
 
-msst2 = AcousticAnalysis._msst(p, 2; length_window=2)
+msst2 = AcousticAnalysis._msst_core(p, 2; length_window=2)
 
 
 # rmse = sqrt(
