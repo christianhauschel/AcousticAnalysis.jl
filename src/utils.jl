@@ -82,3 +82,8 @@ function normalize(pths::Vector{PressureTimeHistory{false, Vector{Float64}, Floa
     ps = normalize(ps; offset_peak_dB=offset_peak_dB)
     return [PressureTimeHistory(p, timestep(pths[1]), pths[1].t0) for p in ps]
 end
+function normalize(pths::Vector{PressureTimeHistory}; offset_peak_dB=0.0)
+    ps = [pth.p for pth in pths]
+    ps = normalize(ps; offset_peak_dB=offset_peak_dB)
+    return [PressureTimeHistory(p, timestep(pths[1]), pths[1].t0) for p in ps]
+end
