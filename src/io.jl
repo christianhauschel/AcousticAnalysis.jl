@@ -72,6 +72,7 @@ Load a `PressureTimeHistory` from a WAV file.
 """
 function load_wav(fname; calibration_factor=2.56e-7, t0=0.0)::AbstractPressureTimeHistory
     p, fs = wavread(fname, format="native")
+    p = p[:, 1]
     p *= calibration_factor
     dt = 1 / fs
     return PressureTimeHistory(p, dt, t0)

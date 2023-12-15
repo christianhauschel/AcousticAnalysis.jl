@@ -9,7 +9,8 @@ end
 Compute the A-weighted time history of a pressure time history.
 """
 function aweighting(pth::AbstractPressureTimeHistory)::AbstractPressureTimeHistory
-    return _aweighting(pth.p, 1/pth.dt)
+    p_A = _aweighting(pth.p, 1/pth.dt)
+    return PressureTimeHistory(p_A, pth.dt, pth.t0)
 end
 
 """
