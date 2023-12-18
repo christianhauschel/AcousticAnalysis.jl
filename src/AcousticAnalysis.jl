@@ -10,8 +10,12 @@ using AcousticMetrics: starttime, timestep, time, pressure, frequency, halfcompl
 using AcousticMetrics: PowerSpectralDensityAmplitude, MSPSpectrumAmplitude, ProportionalBandSpectrum, ExactProportionalBands, center_bands, lower_bands, upper_bands, AbstractPressureTimeHistory
 using FLOWMath: linear
 
-P_REF = 20e-6
-export P_REF
+const A_REF = 1.0
+const R_REF = 1.0 / sqrt(4π)
+const P_REF = 20e-6
+const POWER_REF = 1e-12
+const I_REF = 1e-12
+export P_REF, R_REF, A_REF, POWER_REF, I_REF
 
 export PressureTimeHistory, pressure, time, timestep, starttime, frequency, OASPL
 
@@ -28,7 +32,7 @@ include("filter.jl")
 export highpass, _highpass
 
 include("utils.jl")
-export dbsum, dB, pressure2power, remove_dc_offset, normalize, _normalize, _remove_dc_offset
+export dbsum, dB, pressure2power, remove_dc_offset, normalize, _normalize, _remove_dc_offset, SWL, SPL
 
 include("weighting.jl")
 export dB2dBA, aweighting, _aweighting

@@ -11,6 +11,59 @@ function dB(p; prefix=20, P_REF=20e-6)
 end
 
 """
+Returns the sound pressure level (SPL) from a sound power level (SWL).
+
+# Arguments
+- `SWL`: sound power level [dB]
+- `r`: radius of the sphere [m]
+- `Q`: radiation pattern (sphere: 1, semi-sphere: 2, quarter-sphere: 4, eighth-sphere: 8)
+"""
+function SPL(SWL, r; Q=1)
+    A1 = 4π * r^2 / Q
+    return SPL(SWL, A1; A0=A_REF)
+end
+
+"""
+Returns the sound pressure level (SPL) from a sound power level (SWL).
+
+# Arguments
+- `SWL`: sound power level [dB]
+- `A`: area [m^2]
+- `A0`: reference area [m^2]
+"""
+function SPL(SWL, A; A0=1.0)
+    A1 = 4π * r^2 / Q
+    return SWL - 10 * log10(A1/A_REF)
+end
+
+"""
+Returns the sound power level (SWL) from a sound pressure level (SPL).
+
+# Arguments
+- `SPL`: sound pressure level [dB]
+- `r`: radius of the sphere [m]
+- `Q`: radiation pattern (sphere: 1, semi-sphere: 2, quarter-sphere: 4, eighth-sphere: 8)
+"""
+function SWL(SPL, r; Q=1)
+    A1 = 4π * r^2 / Q
+    return SWL(SPL, A1; A0=A_REF)
+end
+
+"""
+Returns the sound power level (SWL) from a sound pressure level (SPL).
+
+# Arguments
+- `SPL`: sound pressure level [dB]
+- `A`: area [m^2]
+- `A0`: reference area [m^2]
+"""
+function SWL(SPL, A; A0=1.0)
+    return SPL + 10 * log10(A / A0)
+end
+
+
+
+"""
     pressure2power(L_p; r=1, Q=1)
 
 Converts a pressure level to a power level.
