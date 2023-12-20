@@ -69,22 +69,35 @@ end
 
 """
 Load a `PressureTimeHistory` from a WAV file.
+
+# Arguments
+- `fname::String`: Path to the WAV file.
+- `calibration_factor::Number=1.0`: Calibration factor to apply to the pressure data. 
+- `t0::Number=0.0`: Time offset to apply to the pressure data.
+- `format::String="native"`: Format of the WAV file. See `wavread` for details.
+- `kwargs...`: Additional keyword arguments to pass to `wavread`.
+
+# Returns 
+- `pth`: `PressureTimeHistory`
 """
-function load_wav(fname; calibration_factor=2.56e-7, t0=0.0)::AbstractPressureTimeHistory
-    p, fs = wavread(fname, format="native")
+function load_wav(fname; calibration_factor=1.0, t0=0.0, format="native", kwargs...)
+    p, fs, nbits, opt = wavread(fname, format=format, kwargs...)
     p = p[:, 1]
     p *= calibration_factor
     dt = 1 / fs
-    return PressureTimeHistory(p, dt, t0)
+    return PressureTimeHistory(p, dt, t0)#, Int(nbits), opt
 end
 
 """
 Save a pressure vector to a WAV file.
 """
-_save_wav(p::Vector, fs, fname::String) = wavwrite(p, fname, Fs=fs)
+function _save_wav(p::Vector, fs::Number, fname::String; kwargs...)
+    wavwrite(p, fname, Fs=fs; kwargs...)
+end
+
 """
 Save a `PressureTimeHistory` to a WAV file.
 """
-function save_wav(pth::AbstractPressureTimeHistory, fname::String)
-    _save_wav(pth.p, 1/pth.dt, fname)
+function save_wav(pth::AbstractPressureTimeHistory, fname::String; kwargs...)
+    _save_wav(pth.p, 1.0/pth.dt, fname; kwargs...)
 end

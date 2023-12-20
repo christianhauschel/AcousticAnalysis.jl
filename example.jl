@@ -11,7 +11,7 @@ pplt.close("all")
 
 calibration_factor = 256 * 1e-9
 
-pth1 = load_wav("data/01.wav"; calibration_factor=calibration_factor)
+pth1 = load_wav("data/DJIMatrice300RTK_Lateral_1.wav"; calibration_factor=calibration_factor)
 pth2 = load_wav("data/02.wav"; calibration_factor=calibration_factor)
 save_h5(pth1, "out/01_new.h5")
 
@@ -26,6 +26,7 @@ bpf2 = 93.3
 plot_spectrogram(pth2; y_max=1000, fname="out/spectrogram.png", t_window=0.5)
 plot_narrowband_spectrum(pth1; bpf=bpf1, fname="out/spectrum.png", type=:amplitude, aweighting=true)
 plot_propband_spectrum([pth1, pth2]; aweighting=true, fname="out/spectrum_proportional_A.png", label=["1", "2"], alpha=1, lw=1)
+plot_history(time_range(pth1, 0, 0.01); lw=1)
 
 function SWL(SPL, r; Q=1)
     return SPL + abs(10 * log10(Q / (4π * r^2)))
