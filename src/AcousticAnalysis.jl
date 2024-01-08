@@ -1,3 +1,18 @@
+"""
+A package for acoustic analysis.
+
+# Example
+
+```julia
+using AcousticAnalysis
+
+pth = load_wav("audio.wav")
+plot_spectrogram(pth)
+
+oasl = OASPL(pth)
+```
+"""
+
 module AcousticAnalysis
 using PyPlot, PyCall
 using DSP

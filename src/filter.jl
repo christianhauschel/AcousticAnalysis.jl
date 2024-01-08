@@ -18,7 +18,7 @@ function highpass(pth::AbstractPressureTimeHistory, f_highpass; n_poles=10, atte
     designmethod = Elliptic(n_poles, attenuation_ripple, attenuation_stopband)
     filter = digitalfilter(responsetype, designmethod)
     p_filter = DSP.filt(filter, pressure(pth))
-    return PressureTimeHistory(p_filter, timestep(pth))
+    return PressureTimeHistory(p_filter, timestep(pth), pth.t0)
 end
 
 """

@@ -53,9 +53,9 @@ Calculates the n-proportional spectrum of a signal.
 f_center_bands, pbs_dB, pbs
 """
 function _propband_spectrum(
-    p::Vector, fs; n=3, aweighting=false
+    p::Vector, fs; n=3, aweighting=false, t0=0.0
 )
-    pth = PressureTimeHistory(p, 1 / fs)
+    pth = PressureTimeHistory(p, 1 / fs, t0)
     return propband_spectrum(pth; n=n, aweighting=aweighting)
 end
 function propband_spectrum(
