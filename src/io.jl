@@ -91,7 +91,7 @@ end
 """
 Save a pressure vector to a WAV file.
 """
-function _save_wav(p::Vector, fs::Number, fname::String; kwargs...)
+function _save_wav(p::Vector, fs::Int, fname::String; kwargs...)
     wavwrite(p, fname, Fs=fs; kwargs...)
 end
 
@@ -99,5 +99,5 @@ end
 Save a `PressureTimeHistory` to a WAV file.
 """
 function save_wav(pth::AbstractPressureTimeHistory, fname::String; kwargs...)
-    _save_wav(pth.p, 1.0/pth.dt, fname; kwargs...)
+    _save_wav(pth.p, Int(round(1.0/pth.dt)), fname; kwargs...)
 end

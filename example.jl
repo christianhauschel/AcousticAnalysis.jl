@@ -11,7 +11,7 @@ pplt.close("all")
 
 calibration_factor = 256 * 1e-9
 
-pth1 = load_wav("data/DJIMatrice300RTK_Lateral_1.wav"; calibration_factor=calibration_factor)
+pth1 = load_wav("data/01.wav"; calibration_factor=calibration_factor)
 pth2 = load_wav("data/02.wav"; calibration_factor=calibration_factor)
 save_h5(pth1, "out/01_new.h5")
 
@@ -73,3 +73,4 @@ plot_history(pths_norm; fname="out/normalized.png", label=["1", "2"], alpha=1, l
 L_p = OASPL(pth1)
 L_W = pressure2power(L_p; r=1, Q=1)
 
+save_wav(pth1, "out/01.wav")
