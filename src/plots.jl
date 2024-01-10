@@ -269,9 +269,16 @@ function plot_narrowband_spectrum(
     end
 
     if plot_bpf
-        for k in 1:length(list_pth)
+        # Check if bpf elements are all equal
+        if length(unique(bpf)) == 1
             for i = 1:n_bpf
-                ax[1].vlines(bpf[k] * i, ymin, ymax, color=f"C{k-1}", lw=0.5)
+                ax[1].vlines(bpf[1] * i, ymin, ymax, color=f"k", lw=0.5)
+            end
+        else
+            for k in 1:length(list_pth)
+                for i = 1:n_bpf
+                    ax[1].vlines(bpf[k] * i, ymin, ymax, color=f"C{k-1}", lw=0.5)
+                end
             end
         end
     end
