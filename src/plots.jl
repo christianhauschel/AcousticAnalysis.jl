@@ -99,6 +99,7 @@ function plot_narrowband_spectrum(
     show_oaspl=true,
     lw=1,
     alpha=1,
+    xscale="log",
 )
     p = pressure(pth)
     fs = 1 / timestep(pth)
@@ -164,11 +165,10 @@ function plot_narrowband_spectrum(
         end
     end
 
-
-
+    
     ax[1].set(
         title=title,
-        xscale="log",
+        xscale=xscale,
         xlabel=xlabel,
         ylabel=ylabel,
         ylim=(ymin, ymax),
@@ -206,6 +206,7 @@ function plot_narrowband_spectrum(
     aweighting=false,
     lw=1,
     alpha=1,
+    xscale="log",
 )
     pplt = pyimport("proplot")
 
@@ -300,7 +301,7 @@ function plot_narrowband_spectrum(
 
     ax[1].set(
         title=title,
-        xscale="log",
+        xscale=xscale,
         xlabel=xlabel,
         ylabel=ylabel,
         ylim=(ymin, ymax),
@@ -438,6 +439,7 @@ function plot_propband_spectrum(
     show_oaspl=true,
     lw=1,
     alpha=1,
+    xscale="log",
 )
     if show_oaspl
         if label === nothing
@@ -499,7 +501,7 @@ function plot_propband_spectrum(
     end
 
     ax[1].set(
-        xscale="log",
+        xscale=xscale,
         xlim=xlim,
         ylim=ylim,
         xlabel=xlabel,
@@ -534,6 +536,7 @@ function plot_propband_spectrum(
     dpi=300,
     lw=1,
     alpha=1,
+    xscale="log",
 )
     pplt = pyimport("proplot")
     fig, ax = pplt.subplots(figsize=figsize)
@@ -606,7 +609,7 @@ function plot_propband_spectrum(
     end
 
     ax[1].set(
-        xscale="log",
+        xscale=xscale,
         xlim=xlim,
         ylim=ylim,
         xlabel=xlabel,

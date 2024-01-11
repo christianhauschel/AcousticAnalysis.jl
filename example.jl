@@ -24,7 +24,7 @@ bpf1 = 93.3
 bpf2 = 93.3
 
 plot_spectrogram(pth2; y_max=1000, fname="out/spectrogram.png", t_window=0.5)
-plot_narrowband_spectrum([pth1, pth2]; bpf=[bpf1, bpf2], fname="out/spectrum.png", type=:amplitude, aweighting=true)
+plot_narrowband_spectrum([pth1, pth2]; bpf=[bpf1, bpf2], fname="out/spectrum.png", type=:amplitude, aweighting=true, xscale="linear")
 plot_propband_spectrum([pth1, pth2]; aweighting=true, fname="out/spectrum_proportional_A.png", label=["1", "2"], alpha=1, lw=1)
 plot_history(time_range(pth1, 0, 0.01); lw=1)
 
